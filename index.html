@@ -5509,6 +5509,9 @@
           muted = "0.36 0.42 0.38",
           pale = "0.94 0.97 0.94",
           white = "1 1 1";
+        // Read the visible field at export time so browser autofill/paste values
+        // are included even if an input event has not updated the saved model yet.
+        const projectNotes = String(($('projectNotes') && $('projectNotes').value) || model.notes || "").trim();
         const clean = (s) =>
           String(s ?? "")
             .normalize("NFKD")
@@ -5597,13 +5600,23 @@
           false,
           muted,
         );
-        y -= 35;
+        y -= 27;
+        if (projectNotes) {
+          text(42, y, "PROJECT NOTES", 9, true, green);
+          y -= 15;
+          paragraph(projectNotes, 48, 102, 8, dark, 11);
+          y -= 17;
+        } else {
+          y -= 8;
+        }
+        need(105);
         text(42, y, "AREA-NORMALIZED PROGRAM RATES", 10, true, green);
         y -= 16;
         card(42, "NITROGEN", fmt(rates.n, 3), "lb/ac/year reduced");
         card(224, "PHOSPHORUS", fmt(rates.p, 3), "lb/ac/year reduced");
         card(406, "SEDIMENT", fmt(rates.s, 3), "lb/ac/year reduced");
         y -= 105;
+        need(105);
         text(42, y, "ESTIMATED ANNUAL TOTAL REDUCTIONS", 10, true, green);
         y -= 16;
         card(42, "NITROGEN", fmt(nTotal, 1), "lb/year reduced");
