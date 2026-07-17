@@ -5769,6 +5769,46 @@
       };
       if (!model.units.length) model.units.push(defaultUnit());
       render();
+
+      // Keep the parent page's iframe sized to this document as sections change.
+      // This is safe when the tool is opened normally because parent === window.
+      (function setupIframeBridge() {
+        if (window.parent === window) return;
+
+        let lastHeight = 0;
+        let framePending = false;
+
+        function sendHeight() {
+          framePending = false;
+          const height = Math.max(
+            document.documentElement.scrollHeight,
+            document.body ? document.body.scrollHeight : 0,
+          );
+          if (height === lastHeight) return;
+          lastHeight = height;
+          window.parent.postMessage({ type: "sci-tool-height", height: height }, "*");
+        }
+
+        function queueHeight() {
+          if (framePending) return;
+          framePending = true;
+          requestAnimationFrame(sendHeight);
+        }
+
+        window.addEventListener("load", queueHeight);
+        window.addEventListener("resize", queueHeight);
+        document.addEventListener("click", queueHeight);
+        document.addEventListener("change", queueHeight);
+        document.addEventListener("input", queueHeight);
+
+        if (window.ResizeObserver) {
+          new ResizeObserver(queueHeight).observe(document.documentElement);
+        } else {
+          setInterval(queueHeight, 750);
+        }
+
+        queueHeight();
+      })();
     </script>
   </body>
 </html>
