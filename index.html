@@ -558,6 +558,12 @@
           </div>
           <button class="primary no-print" onclick="addUnit()">+ Add management unit</button>
         </div>
+        <div id="sparrowMapUpload" class="kml-box unit-baseline">
+          <h3 style="margin-top:0">SPARROW Map PDF</h3>
+          <div class="guide">Upload a PDF of the SPARROW maps used for this project. It is retained with the project and included in the complete project ZIP.</div>
+          <label>SPARROW map PDF<input id="sparrowMapLoad" type="file" accept="application/pdf,.pdf" /></label>
+          <div id="sparrowMapStatus" class="status">No SPARROW map PDF uploaded yet.</div>
+        </div>
         <div id="unitNav" class="unit-nav no-print"></div>
         <div id="units"></div>
       </section>
@@ -4167,6 +4173,8 @@
         kmlFileName: "",
         kmlFileContent: "",
         kmlBoundaries: [],
+        sparrowMapPdfName: "",
+        sparrowMapPdfData: "",
         units: [],
       };
       let activeUnit = 0;
@@ -4203,6 +4211,8 @@
         if (!model.projectLevel) model.projectLevel = "regional";
         if (!model.farm) model.farm = { name: "", contactName: "", phone: "", email: "", address: "" };
         if (!Array.isArray(model.kmlBoundaries)) model.kmlBoundaries = [];
+        if (model.sparrowMapPdfName == null) model.sparrowMapPdfName = "";
+        if (model.sparrowMapPdfData == null) model.sparrowMapPdfData = "";
         model.units.forEach((u) => (u.practices || []).forEach((p) => {
           if (!Array.isArray(p.boundaryIds)) p.boundaryIds = [];
         }));
@@ -4261,6 +4271,22 @@
           } catch (err) { alert("KML could not be read: " + err.message); }
         };
         r.readAsText(file);
+      }
+      function handleSparrowMapUpload(file) {
+        if (!file) return;
+        if (file.type !== "application/pdf" && !/\.pdf$/i.test(file.name)) {
+          alert("Please upload a PDF file.");
+          return;
+        }
+        const r = new FileReader();
+        r.onload = () => {
+          model.sparrowMapPdfName = file.name;
+          model.sparrowMapPdfData = String(r.result || "");
+          persist();
+          render();
+        };
+        r.onerror = () => alert("The SPARROW map PDF could not be read.");
+        r.readAsDataURL(file);
       }
       function selectedBoundaryAcres(ids) {
         return (ids || []).reduce((s,id) => {
@@ -4669,6 +4695,9 @@
         $("kmlStatus").innerHTML = model.kmlFileName
           ? `✓ ${esc(model.kmlFileName)} loaded — ${model.kmlBoundaries.length} boundaries, ${fmt(kmlAcres,2)} acres`
           : "No KML uploaded yet.";
+        $("sparrowMapStatus").innerHTML = model.sparrowMapPdfName
+          ? `✓ ${esc(model.sparrowMapPdfName)} loaded — it will be included in the complete project ZIP.`
+          : "No SPARROW map PDF uploaded yet.";
         model.units.forEach((u, i) => {
           if (!String(u.name || "").trim()) u.name = "Management Unit " + (i + 1);
           if (!u.baselineMethod || u.baselineMethod === "screening") {
@@ -4838,6 +4867,9 @@
       }
       function safeName() {
         return (model.projectName || "STEPL_Project").replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "");
+      }
+      function safeFileName(name) {
+        return String(name || "file").replace(/[\\/:*?"<>|]+/g, "_").replace(/^_+|_+$/g, "") || "file";
       }
       function haneyCSVValues(u) {
         const h=u.haney||{};
@@ -5594,6 +5626,14 @@
         for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
         return JSON.parse(new TextDecoder().decode(bytes));
       }
+      function dataURLBytes(dataURL) {
+        const comma = String(dataURL || "").indexOf(",");
+        if (comma < 0) return new Uint8Array();
+        const s = atob(String(dataURL).slice(comma + 1));
+        const bytes = new Uint8Array(s.length);
+        for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
+        return bytes;
+      }
       function kmlBoundaryCSV() {
         return "Boundary ID,Boundary Name,Acres\n" + model.kmlBoundaries.map((b) => [b.id,b.name,b.acres].map(csv).join(",")).join("\n");
       }
@@ -5624,6 +5664,7 @@
             { name: "SCI_STEPL_SPARROW_Methodology_White_Paper.pdf", data: makeWhitePaperPDF() },
           ];
         if (model.units.some((u)=>u.haneyAvailable)) files.push({ name: base + "_Haney_Soil_Test_Context.csv", data: enc.encode(haneyContextCSV()) });
+        if (model.sparrowMapPdfData) files.push({ name: base + "_SPARROW_Maps_" + safeFileName(model.sparrowMapPdfName || "Maps.pdf"), data: dataURLBytes(model.sparrowMapPdfData) });
         if (model.kmlFileContent) {
           files.push({ name: base + "_Field_Boundaries.kml", data: enc.encode(model.kmlFileContent) });
           files.push({ name: base + "_KML_Boundaries.csv", data: enc.encode(kmlBoundaryCSV()) });
@@ -5783,6 +5824,7 @@
       $("contactEmail").oninput = (e) => { model.farm.email = e.target.value; persist(); };
       $("farmAddress").oninput = (e) => { model.farm.address = e.target.value; persist(); };
       $("kmlLoad").addEventListener("change", (e) => { handleKMLUpload(e.target.files[0]); e.target.value = ""; });
+      $("sparrowMapLoad").addEventListener("change", (e) => { handleSparrowMapUpload(e.target.files[0]); e.target.value = ""; });
       $("practiceSearch").oninput = renderLibrary;
       $("welcomeStep")
         .querySelector(".welcome-actions")
