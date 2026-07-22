@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>STEPL-Informed Multi-State N, P & Sediment Planner</title>
+    <title>Nutrient & Sediment Loss Planner</title>
     <style>
       :root {
         --green: #2f6b3c;
@@ -477,7 +477,7 @@
     <header>
       <div class="head">
         <div>
-          <h1>STEPL-Informed N, P & Sediment Planner</h1>
+          <h1>Nutrient & Sediment Loss Planner</h1>
           <p>Transparent planning estimates for multi-state conservation programs.</p>
         </div>
         <div class="toolbar no-print">
@@ -5046,7 +5046,7 @@
           p = a ? t.red.p / a : 0,
           s = a ? (t.red.s * 2000) / a : 0,
           lines = [
-            "STEPL-Informed N, P & Sediment Planning Report",
+            "Nutrient & Sediment Loss Planner Report",
             "Project level: " + (model.projectLevel === "farm" ? "Farm Level" : "Regional Level"),
             "Project: " + (model.projectName || "Untitled project"),
             "Planning year: " + (model.year || ""),
@@ -5355,7 +5355,7 @@
       function whitePaperContent() {
         return [
           "## METHODOLOGY WHITE PAPER",
-          "STEPL-Informed SPARROW Water-Quality Reduction Planner",
+          "Nutrient & Sediment Loss Planner",
           "Version 2.1 | Soil & Climate Initiative",
           "",
           "## PURPOSE AND SCOPE",
