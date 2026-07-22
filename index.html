@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Nutrient & Sediment Loss Planner</title>
+    <title>NPSL Model | Nitrogen, Phosphorus and Sediment Loss</title>
     <style>
       :root {
         --green: #2f6b3c;
@@ -477,7 +477,8 @@
     <header>
       <div class="head">
         <div>
-          <h1>Nutrient & Sediment Loss Planner</h1>
+          <h1>NPSL Model</h1>
+          <p><strong>Nitrogen, Phosphorus and Sediment Loss</strong></p>
           <p>Transparent planning estimates for multi-state conservation programs.</p>
         </div>
         <div class="toolbar no-print">
@@ -493,25 +494,24 @@
         <h2>Estimate water-quality reductions in six guided steps</h2>
         <div class="guide">
           <b>Goal:</b> estimate annual nitrogen, phosphorus, and suspended-sediment reductions per acre in lb/ac/year.
-          The wizard will guide you through project details, acreage groups, SPARROW map-class midpoint values,
-          conservation practices, and defensible outputs.
         </div>
         <div class="summary">
           <div>
-            <b>Simple inputs</b><br /><small>Enter only the project, acres, SPARROW values, and practices.</small>
+            <b>Project details</b><br /><small>Add project information, location, and supporting files.</small>
           </div>
-          <div><b>Correct units</b><br /><small>Every pollutant output stays in lb/ac/year.</small></div>
+          <div><b>Acreage units</b><br /><small>Group acres that share a land use, SPARROW baseline, and practice stack.</small></div>
           <div>
-            <b>Clear assumptions</b><br /><small
-              >Map-class midpoint and long-term-average language is filled automatically.</small
+            <b>SPARROW yields</b><br /><small
+              >Enter map-class midpoint or geolocated nitrogen, phosphorus, and sediment yields.</small
             >
           </div>
-          <div><b>Resume later</b><br /><small>Download a complete ZIP and upload it to continue.</small></div>
+          <div><b>Practices &amp; results</b><br /><small>Apply conservation practices, review estimates, and download outputs.</small></div>
         </div>
         <div class="method">
-          <b>Planning estimate:</b> This calculator uses SPARROW map-class midpoint yields and STEPL-listed practice
-          efficiencies. It does not reproduce the complete EPA STEPL/PLET hydrology model and does not represent
-          monitored water-quality outcomes.
+          <b>Planning estimate:</b> This calculator uses SPARROW midpoint or geolocated yields and STEPL-listed
+          practice efficiencies to support planning-level estimates. Results are intended as a practical decision-support
+          reference and may differ from outputs produced by the complete EPA STEPL/PLET hydrology model or site-specific
+          water-quality monitoring.
         </div>
         <div class="welcome-actions no-print"><button class="primary" onclick="goStep(1)">Get started →</button></div>
       </section>
@@ -4735,7 +4735,7 @@
    .join(
      "",
    )}</select></label><label>Acres in this unit<input type="number" min="0" step="0.01" value="${u.acres}" onchange="setUnit(${i},'acres',this.value)"><span class="hint">No practical acreage limit; commas are added in results.</span></label></div>
- <div class="method unit-baseline"><h3 style="margin-top:0">Enter 2012 SPARROW Midwest model values</h3><p><a href="https://apps.usgs.gov/sparrow/sparrow-midwest-2012/" target="_blank" rel="noopener noreferrer">Obtain SPARROW data</a></p><div class="level-toggle"><button type="button" class="${u.sparrowDataMode !== "geolocated" ? "active" : ""}" onclick="setSparrowDataMode(${i},'midpoint')"><b>Map-Class Midpoint Data</b><br><small>Use the midpoint of the displayed SPARROW map range.</small></button><button type="button" class="${u.sparrowDataMode === "geolocated" ? "active" : ""}" onclick="setSparrowDataMode(${i},'geolocated')"><b>Geolocated with Model Boundaries</b><br><small>Use values tied to a specific SPARROW model boundary or catchment.</small></button></div><p>${u.sparrowDataMode === "geolocated" ? "Enter the incremental yields retrieved for the identified SPARROW model boundary—not a display-class midpoint or total upstream load." : "Copy the incremental-yield midpoint for the applicable displayed SPARROW map class—not the total upstream load."} Enter nutrient and sediment yields in kg/km²/year.</p>${u.sparrowDataMode === "geolocated" ? `<div class="grid two"><label>SPARROW model boundary / catchment ID<input value="${esc(u.modelBoundaryId || "")}" placeholder="Model reach, catchment, or boundary identifier" onchange="setSparrow(${i},'modelBoundaryId',this.value)"></label></div>${baselineBoundaryPicker(i,u)}` : ""}<div class="grid"><label>Total Nitrogen yield<br><small>kg/km²/year</small><input type="number" min="0" step="any" value="${esc(u.sparrowTN ?? "")}" onchange="setSparrow(${i},'sparrowTN',this.value)"></label><label>Total Phosphorus yield<br><small>kg/km²/year</small><input type="number" min="0" step="any" value="${esc(u.sparrowTP ?? "")}" onchange="setSparrow(${i},'sparrowTP',this.value)"></label><label>Suspended Sediment yield<br><small>kg/km²/year</small><input type="number" min="0" step="any" value="${esc(u.sparrowSS ?? "")}" onchange="setSparrow(${i},'sparrowSS',this.value)"></label><label>Mean streamflow <small>ft³/s · context only</small><input type="number" min="0" step="any" value="${esc(u.sparrowFlow ?? "")}" onchange="setSparrow(${i},'sparrowFlow',this.value)"></label><div><b>Automatic conversion</b><br><small>TN, TP, and sediment: kg/km²/yr × 0.00893 = lb/ac/yr</small></div><div class="actions"><button class="primary" type="button" onclick="applySparrow(${i})">Apply SPARROW baseline</button></div></div><h3>Converted baseline output</h3><div class="summary"><div><small>Total Nitrogen</small><br><b>${fmt(u.n, 3)} lb/ac/yr</b></div><div><small>Total Phosphorus</small><br><b>${fmt(u.p, 3)} lb/ac/yr</b></div><div><small>Suspended Sediment</small><br><b>${fmt(num(u.s) * 2000, 3)} lb/ac/yr</b></div></div><div class="notice"><b>Streamflow is context only.</b> It is a water-discharge rate and is not multiplied into the yield-based reduction calculation.</div></div>
+ <div class="method unit-baseline"><h3 style="margin-top:0">SPARROW Midpoint or Geolocated Yields</h3><p><a href="https://apps.usgs.gov/sparrow/sparrow-midwest-2012/" target="_blank" rel="noopener noreferrer">Obtain SPARROW data</a></p><div class="level-toggle"><button type="button" class="${u.sparrowDataMode !== "geolocated" ? "active" : ""}" onclick="setSparrowDataMode(${i},'midpoint')"><b>Map-Class Midpoint Data</b><br><small>Use the midpoint of the displayed SPARROW map range.</small></button><button type="button" class="${u.sparrowDataMode === "geolocated" ? "active" : ""}" onclick="setSparrowDataMode(${i},'geolocated')"><b>Geolocated with Model Boundaries</b><br><small>Use values tied to a specific SPARROW model boundary or catchment.</small></button></div><p>${u.sparrowDataMode === "geolocated" ? "Enter the incremental yields retrieved for the identified SPARROW model boundary—not a display-class midpoint or total upstream load." : "Copy the incremental-yield midpoint for the applicable displayed SPARROW map class—not the total upstream load."} Enter nutrient and sediment yields in kg/km²/year.</p>${u.sparrowDataMode === "geolocated" ? `<div class="grid two"><label>SPARROW model boundary / catchment ID<input value="${esc(u.modelBoundaryId || "")}" placeholder="Model reach, catchment, or boundary identifier" onchange="setSparrow(${i},'modelBoundaryId',this.value)"></label></div>${baselineBoundaryPicker(i,u)}` : ""}<div class="grid"><label>Total Nitrogen yield<br><small>kg/km²/year</small><input type="number" min="0" step="any" value="${esc(u.sparrowTN ?? "")}" onchange="setSparrow(${i},'sparrowTN',this.value)"></label><label>Total Phosphorus yield<br><small>kg/km²/year</small><input type="number" min="0" step="any" value="${esc(u.sparrowTP ?? "")}" onchange="setSparrow(${i},'sparrowTP',this.value)"></label><label>Suspended Sediment yield<br><small>kg/km²/year</small><input type="number" min="0" step="any" value="${esc(u.sparrowSS ?? "")}" onchange="setSparrow(${i},'sparrowSS',this.value)"></label><label>Mean streamflow <small>ft³/s · context only</small><input type="number" min="0" step="any" value="${esc(u.sparrowFlow ?? "")}" onchange="setSparrow(${i},'sparrowFlow',this.value)"></label><div><b>Automatic conversion</b><br><small>TN, TP, and sediment: kg/km²/yr × 0.00893 = lb/ac/yr</small></div><div class="actions"><button class="primary" type="button" onclick="applySparrow(${i})">Apply SPARROW baseline</button></div></div><h3>Converted baseline output</h3><div class="summary"><div><small>Total Nitrogen</small><br><b>${fmt(u.n, 3)} lb/ac/yr</b></div><div><small>Total Phosphorus</small><br><b>${fmt(u.p, 3)} lb/ac/yr</b></div><div><small>Suspended Sediment</small><br><b>${fmt(num(u.s) * 2000, 3)} lb/ac/yr</b></div></div><div class="notice"><b>Streamflow is context only.</b> It is a water-discharge rate and is not multiplied into the yield-based reduction calculation.</div></div>
  <div class="status unit-baseline"><label><input type="checkbox" style="width:auto;margin-right:8px" ${u.haneyAvailable?"checked":""} onchange="toggleHaney(${i},this.checked)"> <b>Haney soil test context available</b> <small>Optional; does not affect calculations</small></label></div>${haneyContextHTML(i,u)}
  <div class="grid two unit-baseline"><label>Baseline source / citation <span class="required-note">Filled automatically</span><input value="${esc(u.baselineSource || "")}" readonly></label><label>Baseline assumptions and justification<textarea rows="5" readonly>${esc(u.baselineNotes || "Apply the SPARROW baseline to generate the documented assumptions.")}</textarea></label></div>
  <div class="status unit-baseline"><b>Location:</b> ${esc(u.state)}. The entered SPARROW baseline yields drive the calculation; state is retained for program reporting.</div>
@@ -5046,7 +5046,7 @@
           p = a ? t.red.p / a : 0,
           s = a ? (t.red.s * 2000) / a : 0,
           lines = [
-            "Nutrient & Sediment Loss Planner Report",
+            "NPSL Model Report",
             "Project level: " + (model.projectLevel === "farm" ? "Farm Level" : "Regional Level"),
             "Project: " + (model.projectName || "Untitled project"),
             "Planning year: " + (model.year || ""),
@@ -5355,7 +5355,8 @@
       function whitePaperContent() {
         return [
           "## METHODOLOGY WHITE PAPER",
-          "Nutrient & Sediment Loss Planner",
+          "NPSL Model",
+          "Nitrogen, Phosphorus and Sediment Loss",
           "Version 2.1 | Soil & Climate Initiative",
           "",
           "## PURPOSE AND SCOPE",
